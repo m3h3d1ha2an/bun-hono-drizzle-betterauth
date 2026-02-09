@@ -1,46 +1,63 @@
 # Bun + Hono + Drizzle + BetterAuth
 
-## Getting Started
+A modern, type-safe web application stack combining Bun runtime, Hono framework, Drizzle ORM, and BetterAuth authentication.
+
+## Project Initialization
+
+Initialize a new Hono project using the official template:
 
 ```sh
 bun create hono@latest bun-hono-drizzle-betterauth
 ```
 
-> select **bun** from the template options
-> install the project dependencies
-> select **bun** from the package manager options
+**Setup Steps:**
+1. Select **bun** as your template option
+2. Install project dependencies
+3. Select **bun** as your package manager
 
-### Database Setup with Drizzle ORM
+## Database Configuration
+
+### Install Drizzle ORM Dependencies
 
 ```sh
 bun add drizzle-orm drizzle-seed
 bun add -D drizzle-kit
 ```
 
-### Add the below scripts to `package.json`
+### Configure Package Scripts
+
+Add the following scripts to your `package.json`:
 
 ```json
 {
-  "db:push": "drizzle-kit push",
-  "db:gen": "drizzle-kit generate",
-  "db:mig": "drizzle-kit migrate",
-  "auth:sync": "better-auth generate --config ./src/auth/index.ts --output ./src/db/schema/auth.ts",
-  "auth:secret": "better-auth secret"
-}
-```
-
-### Add import alias to `tsconfig.json`
-
-```json
-{
-  "baseUrl": ".",
-  "paths": {
-    "@/*": ["./src/*"]
+  "scripts": {
+    "db:push": "drizzle-kit push",
+    "db:gen": "drizzle-kit generate",
+    "db:mig": "drizzle-kit migrate",
+    "auth:sync": "better-auth generate --config ./src/auth/index.ts --output ./src/db/schema/auth.ts",
+    "auth:secret": "better-auth secret"
   }
 }
 ```
 
-### Create `bun.d.ts` in the root of your project to get env autocomplete
+### Configure TypeScript Path Aliases
+
+Update your `tsconfig.json` to include path mapping:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+### Configure Environment Variables Type Safety
+
+Create `bun.d.ts` in your project root for environment variable autocompletion:
 
 ```ts
 declare module "bun" {
@@ -51,10 +68,12 @@ declare module "bun" {
 }
 ```
 
-### Create `./src/db/index.ts` file and paste the below code
+### Initialize Database Instance
 
-> this is your db instance and setup your `bun-sql` drizzle adapter for using **postgresql**.
-> [click here to see the official doc](https://orm.drizzle.team/docs/get-started/bun-sql-new)
+Create `./src/db/index.ts` with your PostgreSQL database configuration:
+
+> This file configures your Drizzle database instance using the `bun-sql` adapter for PostgreSQL.  
+> [View official documentation](https://orm.drizzle.team/docs/get-started/bun-sql-new)
 
 ```ts
 import { drizzle } from "drizzle-orm/bun-sql";
@@ -65,23 +84,44 @@ const client = new SQL(process.env.DATABASE_URL);
 export const db = drizzle({ client });
 ```
 
-### Create `./src/db/schema/index.ts` file where all the schemas will be kept
+### Organize Database Schemas
 
-> add the below code to the `./src/db/index.ts` to connect all the schema
+Create `./src/db/schema/index.ts` as your central schema registry.
+
+Update `./src/db/index.ts` to import all schemas:
 
 ```ts
+import { drizzle } from "drizzle-orm/bun-sql";
+import { SQL } from "bun";
 import * as schema from "./schema";
+
+const client = new SQL(process.env.DATABASE_URL);
 
 export const db = drizzle({ client, schema });
 ```
 
-### Add **BetterAuth** to the project
+## Authentication Setup
+
+### Install BetterAuth
 
 ```sh
 bun add better-auth
 bun add -D @better-auth/cli@latest
 ```
 
-### Generate Secret by running `bun --bun run auth:secret` and add to `.env` file
+### Configure Authentication
 
-### Generate **BetterAuth Schema** by running `bun --bun run auth:sync`
+1. Generate a secure authentication secret:
+   ```sh
+   bun --bun run auth:secret
+   ```
+   Add the generated secret to your `.env` file.
+
+2. Generate BetterAuth schema definitions:
+   ```sh
+   bun --bun run auth:sync
+   ```
+
+---
+
+Your development environment is now configured and ready for building secure, type-safe applications.
