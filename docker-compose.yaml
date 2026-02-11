@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:alpine
+    restart: unless-stopped
+    container_name: db-bhdb  # Short for Bun-Hono-Drizzle-BetterAuth
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: testDB
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
